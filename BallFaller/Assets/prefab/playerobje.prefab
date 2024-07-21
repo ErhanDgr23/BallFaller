@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2224553893647073444}
   - component: {fileID: 2224553893647073443}
   - component: {fileID: 2224553893647073464}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: playerobje
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 2224553893647073442}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 12, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.15, y: 1.15, z: 1.15}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2224553893983576121}
@@ -128,7 +128,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e387074bb5546b44b8262190bee92bd9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tiltSensitivity: 4
+  tiltSensitivity: 10
+  cooldown: 3
+  gorunur: 0
+  zmn: 0
 --- !u!1 &2224553893983576120
 GameObject:
   m_ObjectHideFlags: 0
@@ -139,7 +142,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2224553893983576121}
   - component: {fileID: 2224553893983576122}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Point Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}

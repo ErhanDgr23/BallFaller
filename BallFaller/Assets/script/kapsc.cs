@@ -10,8 +10,11 @@ public class kapsc : MonoBehaviour
     public int value;
     public int maxvalue;
 
+    public Color color;
+
     [SerializeField] Image image;
     [SerializeField] TextMeshProUGUI imagetext;
+    [SerializeField] Color[] colors;
     [SerializeField] float[] values;
 
     float currentvalue;
@@ -30,15 +33,13 @@ public class kapsc : MonoBehaviour
             currentvalue = values[lastIndex];
             imagetext.text = values[lastIndex] + "X";
         }
-    }
 
-    private void LateUpdate()
-    {
-        float normalizedValue = Mathf.Clamp01((float)value / 15f);
-        float opacity = Mathf.Lerp(0.65f, 1.0f, Mathf.Abs(normalizedValue - 0.5f) * 2);
-        Color color = Color.Lerp(Color.red, Color.green, Mathf.Abs(normalizedValue - 0.4f) * 2);
-        color.a = opacity;
-        image.color = color;
+        if(value < colors.Length)
+            image.color = colors[value];
+        else
+            image.color = colors[colors.Length - 1];
+
+        color = image.color;
     }
     
     public float takekapvalue()

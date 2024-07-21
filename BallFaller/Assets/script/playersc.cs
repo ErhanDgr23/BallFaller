@@ -5,6 +5,7 @@ using UnityEngine;
 public class playersc : MonoBehaviour
 {
     [SerializeField] float tiltSensitivity = 1f;
+    [SerializeField] float cooldown = 3f;
 
     PhysicMaterial matfizik;
     gamemanager manager;
@@ -12,6 +13,8 @@ public class playersc : MonoBehaviour
     AudioClip hitsound, deathsound, smallwinsound, failsound;
     AudioSource sesci;
     bool tiltmode = true;
+    [SerializeField] bool gorunur;
+    [SerializeField] float zmn;
 
     private void Start()
     {
@@ -23,10 +26,27 @@ public class playersc : MonoBehaviour
         sesci = manager.sesci;
         smallwinsound = manager.smallwinsound;
         failsound = manager.failsound;
+        matfizik.bounciness = Random.Range(0.48f, 0.65f);
     }
 
     private void FixedUpdate()
     {
+        if (!gorunur)
+        {
+            zmn += Time.deltaTime;
+
+            if (zmn > cooldown)
+            {
+                sesci.pitch = 1.2f;
+                sesci.volume = 1f;
+                sesci.PlayOneShot(failsound);
+                Destroy(this.gameObject);
+                zmn = 0f;
+            }
+        }
+        else
+            zmn = 0f;
+
         if (!tiltmode)
             return;
 
@@ -38,40 +58,74 @@ public class playersc : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        matfizik.bounciness = Random.Range(0.48f, 0.7f);
+        matfizik.bounciness = Random.Range(0.48f, 0.65f);
 
         if (collision.gameObject != null)
+        {
+            sesci.pitch = 1.2f;
+            sesci.volume = 0.5f;
             sesci.PlayOneShot(hitsound);
+        }
+
+        if (collision.gameObject.tag == "temas")
+        {
+            collision.transform.GetComponent<Animator>().Play("daire");
+        }
 
         if (collision.gameObject.tag == "death")
         {
-            manager.tophazir = true;
+            sesci.pitch = 1.2f;
+            sesci.volume = 1f;
             sesci.PlayOneShot(failsound);
             Destroy(this.gameObject);
         }
+    }
+
+    private void OnBecameInvisible()
+    {
+        gorunur = false;
+    }
+
+    private void OnBecameVisible()
+    {
+        gorunur = true;
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "kap")
         {
-            manager.oyunbitti(this.gameObject, other.gameObject.transform.parent.GetComponent<kapsc>().takekapvalue());
+            transform.GetComponent<SphereCollider>().enabled = false;
+            other.transform.parent.GetComponent<Animator>().Play("kapanim");
+            manager.oyunbitti(this.gameObject, other.gameObject.transform.parent.GetComponent<kapsc>().takekapvalue(), other.transform.parent.GetComponent<kapsc>());
+            sesci.pitch = 1f;
+            sesci.volume = 1f;
+            sesci.PlayOneShot(smallwinsound);
             rb.velocity = Vector3.zero;
             tiltmode = false;
         }
 
         if (other.gameObject.tag == "coin")
         {
-            manager.updatepuan(2);
+            if(other.transform.parent != null)
+                Destroy(other.transform.parent.gameObject);
+
+            manager.piramidsc.testereteklispawn();
+            manager.updatepuan(1);
+            sesci.pitch = 1f;
+            sesci.volume = 1f;
             sesci.PlayOneShot(smallwinsound);
             Destroy(other.gameObject);
         }
 
         if (other.gameObject.tag == "saw")
         {
-            manager.updatepuan(-2);
-            sesci.PlayOneShot(deathsound);
             Destroy(other.gameObject);
+            manager.piramidsc.testereteklispawn();
+            sesci.pitch = 1.2f;
+            sesci.volume = 1f;
+            sesci.PlayOneShot(failsound);
+            Destroy(this.gameObject);
         }
     }
 }

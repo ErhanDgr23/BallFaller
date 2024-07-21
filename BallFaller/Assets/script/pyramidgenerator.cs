@@ -12,26 +12,24 @@ public class pyramidgenerator : MonoBehaviour {
     [SerializeField] float offsetX = 0.1f;
     [SerializeField] float offsetY = 0.1f;
     [SerializeField] float spacingFactor = 0.5f;
+    [SerializeField] float spacingFactor2 = 0.2f;
     [SerializeField] float testerecount, coincount;
     [SerializeField] Transform sawcoinparent, colliderparent, kapparent, kap, player, parentTransform;
-    [SerializeField] GameObject kappre, coinpre, sawpre, cubePrefab;
+    [SerializeField] GameObject kappre, coinpre, sawpre, cubePrefab, spike;
     [SerializeField] List<GameObject> pyramidCubes = new List<GameObject>();
     [SerializeField] List<Transform> rowParents = new List<Transform>();
     [SerializeField] List<GameObject> coins = new List<GameObject>();
     [SerializeField] List<GameObject> saws = new List<GameObject>();
-
-    private float[] playerxrandom;
+    [SerializeField] List<GameObject> kaplar = new List<GameObject>();
 
     kamsizer kamsizersc;
     gamemanager manager;
-    GameObject kapclone1 = null;
-    GameObject kapclone2 = null;
 
     void Start()
     {
         manager = gamemanager.mangersc;
         kamsizersc = Camera.main.GetComponent<kamsizer>();
-        playerxrandom = new float[] { -0.05f, -0.04f, -0.03f, -0.02f, -0.01f, 0.01f, 0.02f, 0.03f, 0.04f, 0.05f };
+
 
         testerecount = pyramidHeight - Random.Range(4, 8);
         coincount = pyramidHeight - Random.Range(4, 8);
@@ -79,10 +77,51 @@ public class pyramidgenerator : MonoBehaviour {
 
         parentTransform.transform.position = new Vector3(0f, -pyramidHeight * 1.25f, 0f);
         kap.transform.position = new Vector3(0f, (-pyramidHeight * 1.25f) - 2f, 0f);
-        manager.startpos = new Vector3(playerxrandom[Random.Range(0, playerxrandom.Length)], (pyramidHeight * 1.35f) + 1.5f, 0f);
 
+        kap.gameObject.SetActive(false);
         float pyramidHeightvalue = pyramidHeight;
+        kaplar.Clear();
 
+        List<GameObject> ballliste = rowParents[0].GetComponent<rowcountainer>().pyramidBalls;
+
+        for (int i = 1; i < ballliste.Count; i++)
+        {
+            GameObject kapclone1 = Instantiate(kappre, kapparent);
+            kapclone1.transform.position = new Vector3(ballliste[i].transform.position.x - 1f, (-pyramidHeight * 1.25f), 0f);
+            kaplar.Add(kapclone1);
+        }
+
+        if (kaplar.Count % 2 == 0)
+        {
+            int kackere = kaplar.Count - (kaplar.Count / 2);
+
+            for (int i = 0; i < (kackere); i++)
+            {
+                kaplar[kackere + i].GetComponent<kapsc>().value = i;
+            }
+
+            for (int i = 0; i < (kackere); i++)
+            {
+                kaplar[(kackere - 1) - i].GetComponent<kapsc>().value = i;
+            }
+        }
+        if (kaplar.Count % 2 != 0)
+        {
+            float kackere = kaplar.Count - Mathf.Round((kaplar.Count + 1) / 2);
+            print(kackere);
+
+            for (int i = 0; i < kackere + 1; i++)
+            {
+                kaplar[(int)(kackere + i)].GetComponent<kapsc>().value = i;
+            }
+
+            for (int i = 1; i < kackere + 1; i++)
+            {
+                kaplar[(int)(kackere - i)].GetComponent<kapsc>().value = i;
+            }
+        }
+
+        /*
         if (pyramidHeightvalue % 2 == 0)
         {
             kap.gameObject.SetActive(false);
@@ -94,8 +133,8 @@ public class pyramidgenerator : MonoBehaviour {
             kapclone1.GetComponent<kapsc>().maxvalue = (int)(pyramidHeightvalue - 2) / 2;
             kapclone2.GetComponent<kapsc>().maxvalue = (int)(pyramidHeightvalue - 2) / 2;
 
-            kapclone1.transform.position = new Vector3(-1.15f, (-pyramidHeight * 1.5f) - 2f, 0f);
-            kapclone2.transform.position = new Vector3(1.15f, (-pyramidHeight * 1.5f) - 2f, 0f);
+            kapclone1.transform.position = new Vector3(-1.15f, (-pyramidHeight * 1.15f) - 2f, 0f);
+            kapclone2.transform.position = new Vector3(1.15f, (-pyramidHeight * 1.15f) - 2f, 0f);
 
             pyramidHeightvalue = pyramidHeight - 2;
         }
@@ -110,8 +149,8 @@ public class pyramidgenerator : MonoBehaviour {
             kapclone1.GetComponent<kapsc>().maxvalue = (int)(pyramidHeightvalue - 1) / 2;
             kapclone2.GetComponent<kapsc>().maxvalue = (int)(pyramidHeightvalue - 1) / 2;
 
-            kapclone1.transform.position = new Vector3(-1.15f, (-pyramidHeight * 1.5f) - 2f, 0f);
-            kapclone2.transform.position = new Vector3(1.15f, (-pyramidHeight * 1.5f) - 2f, 0f);
+            kapclone1.transform.position = new Vector3(-1.15f, (-pyramidHeight * 1.15f) - 2f, 0f);
+            kapclone2.transform.position = new Vector3(1.15f, (-pyramidHeight * 1.15f) - 2f, 0f);
 
             pyramidHeightvalue = pyramidHeight - 1;
         }
@@ -121,14 +160,14 @@ public class pyramidgenerator : MonoBehaviour {
             if(kapclone2 != null)
             {
                 GameObject kapclone = Instantiate(kappre, kapparent);
-                kapclone.transform.position = new Vector3(kapclone2.transform.position.x + (2.3f * i), (-pyramidHeight * 1.5f) - 2f, 0f);
+                kapclone.transform.position = new Vector3(kapclone2.transform.position.x + (2.3f * i), (-pyramidHeight * 1.15f) - 2f, 0f);
                 kapclone.GetComponent<kapsc>().value = i;
                 kapclone1.GetComponent<kapsc>().maxvalue = (int)(pyramidHeightvalue) / 2;
             }
             else
             {
                 GameObject kapclone = Instantiate(kappre, kapparent);
-                kapclone.transform.position = new Vector3(kap.position.x + (2.3f * i), (-pyramidHeight * 1.5f) - 2f, 0f);
+                kapclone.transform.position = new Vector3(kap.position.x + (2.3f * i), (-pyramidHeight * 1.15f) - 2f, 0f);
                 kapclone.GetComponent<kapsc>().value = i;
                 kapclone1.GetComponent<kapsc>().maxvalue = (int)(pyramidHeightvalue) / 2;
             }
@@ -139,18 +178,19 @@ public class pyramidgenerator : MonoBehaviour {
             if (kapclone1 != null)
             {
                 GameObject kapclone = Instantiate(kappre, kapparent);
-                kapclone.transform.position = new Vector3(kapclone1.transform.position.x - (2.3f * i), (-pyramidHeight * 1.5f) - 2f, 0f);
+                kapclone.transform.position = new Vector3(kapclone1.transform.position.x - (2.3f * i), (-pyramidHeight * 1.15f) - 2f, 0f);
                 kapclone.GetComponent<kapsc>().value = i;
                 kapclone1.GetComponent<kapsc>().maxvalue = (int)(pyramidHeightvalue) / 2;
             }
             else
             {
                 GameObject kapclone = Instantiate(kappre, kapparent);
-                kapclone.transform.position = new Vector3(kap.position.x - (2.3f * i), (-pyramidHeight * 1.5f) - 2f, 0f);
+                kapclone.transform.position = new Vector3(kap.position.x - (2.3f * i), (-pyramidHeight * 1.15f) - 2f, 0f);
                 kapclone.GetComponent<kapsc>().value = i;
                 kapclone1.GetComponent<kapsc>().maxvalue = (int)(pyramidHeightvalue) / 2;
             }
         }
+        */
         #endregion
 
         //colliderolustur sol
@@ -159,11 +199,13 @@ public class pyramidgenerator : MonoBehaviour {
         Vector3 middlePoint = (startPoint + endPoint) / 2;
         Vector3 direction = (endPoint - startPoint).normalized;
 
-        GameObject kup = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        GameObject kup = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+        Destroy(kup.transform.GetComponent<CapsuleCollider>());
+        kup.AddComponent<BoxCollider>();
         kup.transform.position = middlePoint;
         kup.transform.rotation = Quaternion.LookRotation(direction);
         float distance = Vector3.Distance(startPoint, endPoint);
-        kup.transform.localScale = new Vector3(kup.transform.localScale.x + 4f, kup.transform.localScale.y, distance + 8f);
+        kup.transform.localScale = new Vector3(kup.transform.localScale.x + 4f, kup.transform.localScale.y - 0.5f, distance + 2f);
         kup.transform.SetParent(colliderparent);
         kup.GetComponent<MeshRenderer>().material = kupmat;
         kup.tag = "death";
@@ -178,11 +220,13 @@ public class pyramidgenerator : MonoBehaviour {
         Vector3 middlePoint2 = (startPoint2 + endPoint2) / 2;
         Vector3 direction2 = (endPoint2 - startPoint2).normalized;
 
-        GameObject kup2 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        GameObject kup2 = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+        Destroy(kup2.transform.GetComponent<CapsuleCollider>());
+        kup2.AddComponent<BoxCollider>();
         kup2.transform.position = middlePoint2;
         kup2.transform.rotation = Quaternion.LookRotation(direction2);
         float distance2 = Vector3.Distance(startPoint2, endPoint2);
-        kup2.transform.localScale = new Vector3(kup2.transform.localScale.x + 4f, kup2.transform.localScale.y, distance2 + 8f);
+        kup2.transform.localScale = new Vector3(kup2.transform.localScale.x + 4f, kup2.transform.localScale.y - 0.5f, distance2 + 2f);
         kup2.transform.SetParent(colliderparent);
         kup2.GetComponent<MeshRenderer>().material = kupmat;
         kup2.tag = "death";
@@ -191,7 +235,30 @@ public class pyramidgenerator : MonoBehaviour {
         kamsizersc.targetObject1 = kup.transform;
         kamsizersc.targetObject2 = kup2.transform;
 
+        //DistributeObjects(kup);
+        //DistributeObjects(kup2);
         testerecoinspawn();
+    }
+
+    void DistributeObjects(GameObject item)
+    {
+        float objectCount = item.transform.localScale.z * spacingFactor2;
+        float spikeWidth = spike.transform.localScale.x;
+
+        Vector3 startPosition = item.transform.position - item.transform.forward * item.transform.localScale.z / 2.15f;
+        Vector3 endPosition = item.transform.position + item.transform.forward * item.transform.localScale.z / 2.15f;
+
+        for (float i = 0; i < objectCount; i++)
+        {
+            float t = i / (objectCount - 1);
+            Vector3 position = Vector3.Lerp(startPosition, endPosition, t);
+            position += item.transform.forward * spikeWidth * t * spacingFactor2;
+            GameObject newObj = Instantiate(spike, position, Quaternion.identity);
+            Vector3 lookAtPosition = item.transform.position - item.transform.forward * t * item.transform.localScale.z;
+            newObj.transform.LookAt(lookAtPosition, -Vector3.up);
+            newObj.transform.Rotate(Vector3.up, 90f, Space.Self);
+            newObj.transform.parent = item.transform;
+        }
     }
 
     public void testerecoinspawn()
@@ -275,8 +342,15 @@ public class pyramidgenerator : MonoBehaviour {
             float xpos = playerxrandom[Random.Range(0, playerxrandom.Length)];
             float ypos = playeryrandom[Random.Range(0, playeryrandom.Length)];
             ballclone.transform.position = randomRowObjectBall.transform.position + new Vector3(xpos, ypos, 0f);
+
+            float[] plxrdm2 = new float[] { 1.25f, -1.25f };
+            float xp2 = plxrdm2[Random.Range(0, plxrdm2.Length)];
+            GameObject ballclonecoin = Instantiate(coinpre, ballclone.transform.position + new Vector3(xp2, 0f, 0f), Quaternion.identity);
+            ballclonecoin.transform.SetParent(ballclone.transform);
+            coins.Add(ballclonecoin);
         }
 
+        /*
         //coin olusturucu
         for (int i = 0; i < coincount; i++)
         {
@@ -302,6 +376,36 @@ public class pyramidgenerator : MonoBehaviour {
             float ypos = playeryrandom[Random.Range(0, playeryrandom.Length)];
             ballclone.transform.position = randomRowObjectBall.transform.position + new Vector3(xpos, ypos, 0f);
         }
+        */ // coin olusturucu
+    }
+
+    public void testereteklispawn()
+    {
+        int randomIndex = Random.Range(1, rowParents.Count - 1);
+        rowcountainer randomRowParent = rowParents[randomIndex].GetComponent<rowcountainer>();
+
+        List<GameObject> pyramidballclone = randomRowParent.pyramidBalls;
+
+        int randomRowObject;
+        if (randomRowParent.pyramidBalls.Count > 3)
+            randomRowObject = Random.Range(1, pyramidballclone.Count - 2);
+        else
+            randomRowObject = 1;
+        GameObject randomRowObjectBall = pyramidballclone[randomRowObject];
+
+        GameObject ballclone = Instantiate(sawpre, sawcoinparent);
+        GameObject ballclonecoin = Instantiate(coinpre, ballclone.transform);
+        saws.Add(ballclone);
+        coins.Add(ballclonecoin);
+        float[] playerxrandom = new float[] { 0.8f, 0f, -0.8f };
+        float[] playerxrandom2 = new float[] { 1.25f, -1.25f };
+        float[] playeryrandom = new float[] { 1.25f, -1.25f };
+
+        float xpos = playerxrandom[Random.Range(0, playerxrandom.Length)];
+        float xpos2 = playerxrandom2[Random.Range(0, playerxrandom2.Length)];
+        float ypos = playeryrandom[Random.Range(0, playeryrandom.Length)];
+        ballclone.transform.position = randomRowObjectBall.transform.position + new Vector3(xpos, ypos, 0f);
+        ballclonecoin.transform.position = ballclone.transform.position + new Vector3(xpos2, 0f, 0f);
     }
 
     public void ClearPyramid()
